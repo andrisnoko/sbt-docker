@@ -9,6 +9,7 @@ object DockerPlugin extends AutoPlugin {
     val docker = DockerKeys.docker
     val dockerfile = DockerKeys.dockerfile
     val dockerPath = DockerKeys.dockerPath
+
     @deprecated("Use imageNames instead.", "1.0.0")
     val imageName = DockerKeys.imageName
     val imageNames = DockerKeys.imageNames
@@ -24,6 +25,8 @@ object DockerPlugin extends AutoPlugin {
 
     val CopyFile = sbtdocker.staging.CopyFile
     type CopyFile = sbtdocker.staging.CopyFile
+
+
 
     /**
      * Settings to automatically build a Docker image for a JVM application.

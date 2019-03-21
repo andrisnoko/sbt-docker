@@ -3,19 +3,10 @@ package sbtdocker
 import sbt.Keys.target
 import sbt._
 import sbtdocker.DockerKeys._
-import sbtdocker.staging.DefaultDockerfileProcessor
+import sbtdocker.staging.{DefaultDockerFromFileProcessor, DefaultDockerfileProcessor}
 
 object DockerSettings {
-  lazy val baseDockerSettings = Seq(
-    docker := {
-      val log = Keys.streams.value.log
-      val dockerPath = (DockerKeys.dockerPath in docker).value
-      val buildOptions = (DockerKeys.buildOptions in docker).value
-      val stageDir = (target in docker).value
-      val dockerfile = (DockerKeys.dockerfile in docker).value
-      val imageNames = (DockerKeys.imageNames in docker).value
-      DockerBuild(dockerfile, DefaultDockerfileProcessor, imageNames, buildOptions, stageDir, dockerPath, log)
-    },
+  lazy val commonBaseDockerSettings = Seq (
     dockerPush := {
       val log = Keys.streams.value.log
       val dockerPath = (DockerKeys.dockerPath in docker).value
@@ -30,17 +21,6 @@ object DockerSettings {
         id
       }
     }.value,
-    dockerfile in docker := {
-      sys.error(
-        """A Dockerfile is not defined. Please define one with `dockerfile in docker`
-          |
-          |Example:
-          |dockerfile in docker := new Dockerfile {
-          | from("ubuntu")
-          | ...
-          |}
-        """.stripMargin)
-    },
     target in docker := target.value / "docker",
     imageName in docker := {
       val organisation = Option(Keys.organization.value).filter(_.nonEmpty)
@@ -53,6 +33,53 @@ object DockerSettings {
     dockerPath in docker := sys.env.get("DOCKER").filter(_.nonEmpty).getOrElse("docker"),
     buildOptions in docker := BuildOptions()
   )
+
+  lazy val baseDockerSettings = Seq(
+    docker := {
+      val log = Keys.streams.value.log
+      val dockerPath = (DockerKeys.dockerPath in docker).value
+      val buildOptions = (DockerKeys.buildOptions in docker).value
+      val stageDir = (target in docker).value
+      val dockerfile = (DockerKeys.dockerfile in docker).value
+      val imageNames = (DockerKeys.imageNames in docker).value
+      DockerBuild.Dockerfileapply(dockerfile, DefaultDockerfileProcessor, imageNames, buildOptions, stageDir,
+        dockerPath, log)
+    },
+    dockerfile in docker := {
+      sys.error(
+        """A Dockerfile is not defined. Please define one with `dockerfile in docker`
+          |
+          |Example:
+          |dockerfile in docker := new Dockerfile {
+          | from("ubuntu")
+          | ...
+          |}
+        """.stripMargin)
+    }
+  ) ++ commonBaseDockerSettings
+
+  lazy val baseDockerFileSettings = Seq(
+    docker := {
+      val log = Keys.streams.value.log
+      val dockerPath = (DockerKeys.dockerPath in docker).value
+      val buildOptions = (DockerKeys.buildOptions in docker).value
+      val stageDir = (target in docker).value
+      val imageNames = (DockerKeys.imageNames in docker).value
+      val dockerFromFile = (DockerKeys.dockerFromFile in docker).value
+      DockerBuild.DockerFromfileapply(DefaultDockerFromFileProcessor,imageNames, buildOptions,
+        stageDir, dockerPath, log, dockerFromFile)
+    },
+     dockerFromFile in docker := {
+       sys.error(
+         """ dockerFromFile in docker := {
+           |      new DockerFromFile {
+           |        dockerFilePath(.......)
+           |        addResource(......)
+           |      }
+           |    },
+         """.stripMargin)
+     }
+  ) ++ commonBaseDockerSettings
 
   def autoPackageJavaApplicationSettings(
     fromImage: String,
