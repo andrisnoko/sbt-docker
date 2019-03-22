@@ -20,7 +20,7 @@ object DockerBuild {
     * @param buildOptions options for the build command
     * @param log          logger
     */
-  def Dockerfileapply(dockerfile: DockerfileLike, processor: DockerfileProcessor, imageNames: Seq[ImageName],
+  def apply(dockerfile: DockerfileLike, processor: DockerfileProcessor, imageNames: Seq[ImageName],
                       buildOptions: BuildOptions, stageDir: File, dockerPath: String,
                       log: Logger): ImageId = {
     val staged = processor(dockerfile, stageDir)
@@ -39,36 +39,40 @@ object DockerBuild {
     * @param log          logger
     */
   def apply(staged: StagedDockerfile, imageNames: Seq[ImageName], buildOptions: BuildOptions,
-            stageDir: File, dockerPath: String, log: Logger): ImageId = {
-    log.debug("Building Dockerfile:\n" + staged.instructionsString)
-
+            stageDir: File, dockerPath: String, log: Logger, dockerTextFile: Option[File] =
+            Option.empty)
+  : ImageId
+  = {
     log.debug(s"Preparing stage directory '${stageDir.getPath}'")
 
-    createDockerfile(staged, stageDir)
-    prepareFiles(staged)
-    buildAndTag(imageNames, stageDir, dockerPath, buildOptions, log)
-  }
-
-
-  def DockerFromfileapply(processor: DockerFromFileProcessor, imageNames: Seq[ImageName],
-                          buildOptions: BuildOptions,
-                          stageDir: File, dockerPath: String, log: Logger, dockerFromFile: DockerFromFileInstructions)
-  : ImageId = {
-    log.debug("Building Dockerfile:\n" + dockerFromFile)
-
-    log.debug(s"Preparing stage directory '${stageDir.getPath}'")
-    val staged = processor(dockerFromFile, stageDir)
-    val dockerFile = dockerFilePath(dockerFromFile.instructions)
     clean(stageDir)
-    copyDockerfile(dockerFile, stageDir)
+    if (!dockerTextFile.isEmpty) {
+      copyDockerfile(dockerTextFile.get, stageDir)
+    } else {
+      log.debug("Building Dockerfile:\n" + staged.instructionsString)
+      createDockerfile(staged, stageDir)
+    }
     prepareFiles(staged)
     buildAndTag(imageNames, stageDir, dockerPath, buildOptions, log)
   }
 
-  private[sbtdocker] def dockerFilePath (instructions: Seq[Instruction]) = {
+  def apply(dockerFromFile: DockerFromFileInstructions, processor: DockerFromFileProcessor,
+            imageNames: Seq[ImageName],
+            buildOptions: BuildOptions,
+            stageDir: File,
+            dockerPath: String,
+            log: Logger)
+  : ImageId = {
+    val staged = processor(dockerFromFile, stageDir)
+    val dockerfilePath = dockerfile(dockerFromFile.instructions)
+    apply(staged, imageNames, buildOptions, stageDir, dockerPath, log, Option(dockerfilePath))
+  }
+
+
+  private[sbtdocker] def dockerfile (instructions: Seq[Instruction]) = {
     val i = instructions.find( _.isInstanceOf[DockerfileStaging])
-    val d = i.get.asInstanceOf[DockerfilePath]
-    d.dockerfilePath
+    val d = i.get.asInstanceOf[FromFile]
+    d.dockerfile
   }
 
   private[sbtdocker] def copyDockerfile(dockerFile: File, stageDir: File) = {

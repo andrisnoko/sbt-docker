@@ -1,9 +1,8 @@
 package sbtdocker
 
-import java.io.File
-
-import sbtdocker.Instructions.{DockerfileStaging, ResourceFileStaging}
-import sbtdocker.staging.{CopyFile, SourceFile}
+import sbt.File
+import sbtdocker.Instructions.DockerfileStaging
+import sbtdocker.staging.CopyFile
 
 trait DockerFromFileInstructions extends DockerFromFileCommands {
   type T <: DockerFromFileInstructions
@@ -14,13 +13,29 @@ trait DockerFromFileCommands {
   type T <: DockerFromFileCommands
   def addInstruction(instruction: Instruction): T
 
-  def dockerFilePath(filePath: File): T = addInstruction(DockerfilePath(filePath))
+  /**
+    *
+    * @param dockerFile Dockerfile to stage
+    */
+  def fromFile(dockerFile: File): T = addInstruction(FromFile(dockerFile))
 
-  def addResource(directory: String, include: String): T
-  = addInstruction(ResourcesFile(CopyFile( new File(directory + "/" + include)), include))
-
+  /**
+    * Stage a file. The file will be copied to the stage directory when the Dockerfile is built.
+    *
+    *
+    * The `target` file must be unique for this Dockerfile. Otherwise later staged files will overwrite previous
+    * files on the same target.
+    *
+    * @param source File to copy into stage dir.
+    * @param target Path to copy file to, should be relative to the stage dir.
+    */
+  def stageFile(source: File, target: String): T = {
+    addInstruction(Instructions.StageFiles(CopyFile(source), target))
+  }
 }
 
-case class DockerfilePath(dockerfilePath: File) extends DockerfileStaging
-
-case class ResourcesFile(source: SourceFile, include: String) extends ResourceFileStaging
+  /**
+    *
+    * @param dockerfile Dockerfile to stage
+    */
+case class FromFile(dockerfile: File) extends DockerfileStaging

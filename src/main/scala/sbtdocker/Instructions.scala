@@ -320,13 +320,8 @@ object Instructions {
     def apply(source: SourceFile, destination: String): StageFiles = StageFiles(Seq(source), destination)
   }
 
-  trait ResourceFileStaging extends Instruction {
-    def source: SourceFile
-    def include: String
-  }
-
   trait DockerfileStaging extends Instruction {
-    def dockerfilePath: File
+    def dockerfile: File
   }
 
   /**

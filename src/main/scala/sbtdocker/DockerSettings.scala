@@ -42,7 +42,7 @@ object DockerSettings {
       val stageDir = (target in docker).value
       val dockerfile = (DockerKeys.dockerfile in docker).value
       val imageNames = (DockerKeys.imageNames in docker).value
-      DockerBuild.Dockerfileapply(dockerfile, DefaultDockerfileProcessor, imageNames, buildOptions, stageDir,
+      DockerBuild(dockerfile, DefaultDockerfileProcessor, imageNames, buildOptions, stageDir,
         dockerPath, log)
     },
     dockerfile in docker := {
@@ -58,7 +58,7 @@ object DockerSettings {
     }
   ) ++ commonBaseDockerSettings
 
-  lazy val baseDockerFileSettings = Seq(
+  lazy val baseDockerFromFileSettings = Seq(
     docker := {
       val log = Keys.streams.value.log
       val dockerPath = (DockerKeys.dockerPath in docker).value
@@ -66,12 +66,13 @@ object DockerSettings {
       val stageDir = (target in docker).value
       val imageNames = (DockerKeys.imageNames in docker).value
       val dockerFromFile = (DockerKeys.dockerFromFile in docker).value
-      DockerBuild.DockerFromfileapply(DefaultDockerFromFileProcessor,imageNames, buildOptions,
-        stageDir, dockerPath, log, dockerFromFile)
+      DockerBuild(dockerFromFile, DefaultDockerFromFileProcessor,imageNames, buildOptions, stageDir, dockerPath, log)
     },
      dockerFromFile in docker := {
        sys.error(
-         """ dockerFromFile in docker := {
+         """A DockerFromFile is not defined. Please define one with `dockerFromFile in docker`
+           |
+           |dockerFromFile in docker := {
            |      new DockerFromFile {
            |        dockerFilePath(.......)
            |        addResource(......)

@@ -1,7 +1,3 @@
-import sbtdocker.DockerFromFilePlugin
-import _root_.sbtdocker.DockerFromFilePlugin.autoImport.{ImageName, docker, dockerFromFile, imageNames}
-import sbtdocker.mutable.DockerFromFile
-
 enablePlugins(DockerFromFilePlugin)
 
 name := "docker-from-file"
@@ -16,8 +12,9 @@ libraryDependencies += "joda-time" % "joda-time" % "2.7"
 
 dockerFromFile in docker := {
   new DockerFromFile {
-    dockerFilePath(baseDirectory.value / "Dockerfile")
-    addResource(target.value.getPath + "/scala-2.11" , "docker-from-file_2.11-0.1.0.jar")
+    fromFile(baseDirectory.value / "Dockerfile")
+    stageFile(target.value / "scala-2.11/docker-from-file_2.11-0.1.0.jar",
+      "docker-from-file_2.11-0.1.0.jar")
   }
 }
 
