@@ -8,7 +8,6 @@ libraryDependencies ++= Seq(
   "org.scalatest" %% "scalatest" % "3.0.3" % "test",
   "org.apache.commons" % "commons-lang3" % "3.5"
 )
-crossScalaVersions    := Seq("2.10.7", "2.11.12", "2.12.6")
 
 scalacOptions := Seq("-deprecation", "-unchecked", "-feature")
 
