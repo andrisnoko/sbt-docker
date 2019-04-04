@@ -6,7 +6,7 @@ import sbtdocker.DockerKeys._
 import sbtdocker.staging.{DefaultDockerFromFileProcessor, DefaultDockerfileProcessor}
 
 object DockerSettings {
-  lazy val commonBaseDockerSettings = Seq (
+  lazy val commonDockerSettings = Seq (
     dockerPush := {
       val log = Keys.streams.value.log
       val dockerPath = (DockerKeys.dockerPath in docker).value
@@ -34,7 +34,7 @@ object DockerSettings {
     buildOptions in docker := BuildOptions()
   )
 
-  lazy val baseDockerSettings = Seq(
+  lazy val baseDockerSettings = Seq (
     docker := {
       val log = Keys.streams.value.log
       val dockerPath = (DockerKeys.dockerPath in docker).value
@@ -55,10 +55,9 @@ object DockerSettings {
           | ...
           |}
         """.stripMargin)
-    }
-  ) ++ commonBaseDockerSettings
+    }) ++ commonDockerSettings
 
-  lazy val baseDockerFromFileSettings = Seq(
+  lazy val dockerFromFileSettings = Seq(
     docker := {
       val log = Keys.streams.value.log
       val dockerPath = (DockerKeys.dockerPath in docker).value
@@ -66,21 +65,22 @@ object DockerSettings {
       val stageDir = (target in docker).value
       val imageNames = (DockerKeys.imageNames in docker).value
       val dockerFromFile = (DockerKeys.dockerFromFile in docker).value
-      DockerBuild(dockerFromFile, DefaultDockerFromFileProcessor,imageNames, buildOptions, stageDir, dockerPath, log)
+      DockerBuild(dockerFromFile, DefaultDockerFromFileProcessor,imageNames, buildOptions,
+        stageDir, dockerPath, log)
     },
-     dockerFromFile in docker := {
-       sys.error(
-         """A DockerFromFile is not defined. Please define one with `dockerFromFile in docker`
-           |
-           |dockerFromFile in docker := {
-           |      new DockerFromFile {
-           |        dockerFilePath(.......)
-           |        addResource(......)
-           |      }
-           |    },
-         """.stripMargin)
-     }
-  ) ++ commonBaseDockerSettings
+    dockerFromFile in docker := {
+      sys.error(
+        """A DockerSourceFile is not defined. Please define one with `dockerSource in docker`
+          |
+          |dockerSource in docker := {
+          |      new DockerSourceFile {
+          |        stageFile("path-to-docker-file", "Dockerfile")
+          |        stageFile(......)
+          |      }
+          |    },
+        """.stripMargin)
+    }
+  ) ++ commonDockerSettings
 
   def autoPackageJavaApplicationSettings(
     fromImage: String,

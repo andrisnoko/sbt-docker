@@ -2,11 +2,11 @@ package object sbtdocker {
   val Dockerfile = mutable.Dockerfile
   type Dockerfile = mutable.Dockerfile
 
-  val DockerFromFile = mutable.DockerFromFile
-  type DockerFromFile = mutable.DockerFromFile
-
   type ImmutableDockerfile = immutable.Dockerfile
   val ImmutableDockerfile = immutable.Dockerfile
+
+  val DockerFromFile = mutable.DockerFromFile
+  type DockerFromFile = mutable.DockerFromFile
 
   type ImmutableDockerFromFile = immutable.DockerFromFile
   val ImmutableDockerFromFile = immutable.DockerFromFile

@@ -16,4 +16,5 @@ object DockerKeys {
   val buildOptions = settingKey[BuildOptions]("Options for the Docker build command.")
 
   val dockerFromFile = taskKey[DockerFromFileInstructions]("Definition of the Docker text file.")
+
 }

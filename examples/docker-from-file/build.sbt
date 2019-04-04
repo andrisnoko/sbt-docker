@@ -11,7 +11,7 @@ dockerFromFile in docker := {
   val artifact: File = assembly.value
 
   new DockerFromFile {
-    fromFile(baseDirectory.value / "Dockerfile")
+    stageFile(baseDirectory.value / "Dockerfile", "Dockerfile")
     stageFile(artifact, "example-sbt-assembly-assembly-0.1.0.jar")
   }
 }

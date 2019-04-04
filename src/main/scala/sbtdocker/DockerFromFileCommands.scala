@@ -1,7 +1,6 @@
 package sbtdocker
 
 import sbt.File
-import sbtdocker.Instructions.DockerfileStaging
 import sbtdocker.staging.CopyFile
 
 trait DockerFromFileInstructions extends DockerFromFileCommands {
@@ -12,12 +11,6 @@ trait DockerFromFileInstructions extends DockerFromFileCommands {
 trait DockerFromFileCommands {
   type T <: DockerFromFileCommands
   def addInstruction(instruction: Instruction): T
-
-  /**
-    *
-    * @param dockerFile Dockerfile to stage
-    */
-  def fromFile(dockerFile: File): T = addInstruction(FromFile(dockerFile))
 
   /**
     * Stage a file. The file will be copied to the stage directory when the Dockerfile is built.
@@ -33,9 +26,3 @@ trait DockerFromFileCommands {
     addInstruction(Instructions.StageFiles(CopyFile(source), target))
   }
 }
-
-  /**
-    *
-    * @param dockerfile Dockerfile to stage
-    */
-case class FromFile(dockerfile: File) extends DockerfileStaging

@@ -12,7 +12,7 @@ libraryDependencies += "joda-time" % "joda-time" % "2.7"
 
 dockerFromFile in docker := {
   new DockerFromFile {
-    fromFile(baseDirectory.value / "Dockerfile")
+    stageFile(baseDirectory.value / "Dockerfile", "Dockerfile")
     stageFile(target.value / "scala-2.11/docker-from-file_2.11-0.1.0.jar",
       "docker-from-file_2.11-0.1.0.jar")
   }

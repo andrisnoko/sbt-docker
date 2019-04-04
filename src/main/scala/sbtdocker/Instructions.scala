@@ -320,10 +320,6 @@ object Instructions {
     def apply(source: SourceFile, destination: String): StageFiles = StageFiles(Seq(source), destination)
   }
 
-  trait DockerfileStaging extends Instruction {
-    def dockerfile: File
-  }
-
   /**
    * Stages files. Only adds files and directories to the staging directory, will not yield an
    * instruction in the Dockerfile.

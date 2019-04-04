@@ -26,9 +26,7 @@ object DockerPlugin extends AutoPlugin {
     val CopyFile = sbtdocker.staging.CopyFile
     type CopyFile = sbtdocker.staging.CopyFile
 
-
-
-    /**
+      /**
      * Settings to automatically build a Docker image for a JVM application.
      * @param fromImage Base image to use. Should have a JVM on the PATH.
      * @param exposedPorts List of ports to expose.

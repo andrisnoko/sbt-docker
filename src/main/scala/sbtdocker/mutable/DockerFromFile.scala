@@ -2,7 +2,7 @@ package sbtdocker.mutable
 
 import sbtdocker.{DockerFromFileInstructions, Instruction}
 
-case class DockerFromFile (var instructions: Seq[Instruction] = Seq.empty) extends DockerFromFileInstructions {
+case class DockerFromFile(var instructions: Seq[Instruction] = Seq.empty) extends DockerFromFileInstructions {
   type T = DockerFromFile
 
   def addInstruction(instruction: Instruction) = {
